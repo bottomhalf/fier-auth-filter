@@ -1,0 +1,39 @@
+name: Release to Maven Central
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+
+jobs:
+  release:
+    name: Deploy to Maven Central
+    runs-on: ubuntu-latest  # GitHub-hosted runner (Linux recommended)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17' # or your Java version
+          cache: maven
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 --decode | gpg --batch --import
+          # Trust the imported key automatically
+          KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
+          echo "trust-key $KEY_ID\n5\ny\n" | gpg --command-fd 0 --batch --edit-key $KEY_ID
+        env:
+          GPG_TTY: $(tty)
+
+      - name: Deploy to Maven Central
+        run: mvn clean deploy -Prelease -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
+        env:
+          OSSRH_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+

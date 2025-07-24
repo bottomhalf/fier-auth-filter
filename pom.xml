@@ -7,7 +7,7 @@
     <groupId>com.fierhub</groupId>
     <artifactId>fier-auth-filter</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>auth-filter</name>
+    <name>fier-auth-filter</name>
     <description>filter to auto check authentication key</description>
 
     <licenses>
@@ -27,32 +27,37 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/bottomhalf/fierhub-svc-auth.git</connection>
-        <developerConnection>scm:git:ssh://github.com:bottomhalf/fierhub-svc-auth.git</developerConnection>
-        <url>http://github.com/bottomhalf/fierhub-svc-auth.git/tree/main</url>
+        <connection>scm:git:git://github.com/bottomhalf/fier-auth-filter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:bottomhalf/fier-auth-filter.git</developerConnection>
+        <url>http://github.com/bottomhalf/fier-auth-filter.git</url>
     </scm>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
     </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.8.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                </configuration>
-            </plugin>
+            <!-- 1. Sign your artifacts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.0.1</version> <!-- Use newer version -->
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -60,9 +65,29 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                            <keyname>9329C903937648DB</keyname>
+                            <passphrase>${gpg.passphrase}</passphrase>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- 2. Publish to Maven Central using the latest plugin -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>ossrh</publishingServerId>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
 </project>
