@@ -27,12 +27,11 @@ jobs:
           # Trust the imported key automatically
           KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
           echo "trust-key $KEY_ID\n5\ny\n" | gpg --command-fd 0 --batch --edit-key $KEY_ID
-        env:
-          GPG_TTY: $(tty)
 
       - name: Deploy to Maven Central
         run: mvn clean deploy -Prelease -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
         env:
+          GPG_TTY: $(tty)
           OSSRH_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
