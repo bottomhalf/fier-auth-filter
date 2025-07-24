@@ -2,8 +2,8 @@ name: Release to Maven Central
 
 on:
   push:
-    tags:
-      - 'v*'  # Trigger on version tags like v1.0.0
+    branches:
+      - main  # Trigger on push to the main branch
 
 jobs:
   release:
