@@ -14,7 +14,7 @@
             <id>ossrh</id>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
-                <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
+                <gpg.passphrase>bottomhalf_mvn_key</gpg.passphrase>
             </properties>
         </profile>
     </profiles>
