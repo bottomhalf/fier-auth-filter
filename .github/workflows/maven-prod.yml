@@ -21,6 +21,11 @@ jobs:
           java-version: '17' # or your Java version
           cache: maven
 
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/settings.xml ~/.m2/settings.xml
+
       - name: Import GPG key
         run: |
           echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 --decode | gpg --batch --import
